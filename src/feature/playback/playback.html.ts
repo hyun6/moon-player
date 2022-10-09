@@ -1,9 +1,14 @@
 import { convertFileSrc } from "@tauri-apps/api/tauri";
-import { usePlayback } from "../../hooks/usePlayback";
+import { playbackState } from "../../hooks/usePlayback";
+import {
+  PlaybackModuleState,
+  PlaybackState,
+} from "../../models/playbackState.model";
 import { IPlaybackModule } from "./playback.interface";
 
 const logger = console.log;
-class HtmlPlaybackModule implements IPlaybackModule {
+
+export class HtmlPlaybackModule implements IPlaybackModule {
   private _playbackModule: HTMLAudioElement = new Audio();
 
   constructor() {
@@ -15,6 +20,7 @@ class HtmlPlaybackModule implements IPlaybackModule {
       // this._eventBus?.emitEventTimeUpdated({
       //   currentTime: this._playbackModule.currentTime,
       // });
+      playbackState.currentTime = this._playbackModule.currentTime;
     });
 
     this._playbackModule.addEventListener("canplay", () => {
@@ -22,6 +28,7 @@ class HtmlPlaybackModule implements IPlaybackModule {
       // this._eventBus?.emitEventStatusChanged({
       //   status: PlaybackStatus.Prepared,
       // });
+      playbackState.state = PlaybackModuleState.Prepared;
     });
 
     this._playbackModule.addEventListener("play", () => {
@@ -29,6 +36,7 @@ class HtmlPlaybackModule implements IPlaybackModule {
       // this._eventBus?.emitEventStatusChanged({
       //   status: PlaybackStatus.Started,
       // });
+      playbackState.state = PlaybackModuleState.Started;
     });
 
     this._playbackModule.addEventListener("pause", () => {
@@ -36,6 +44,7 @@ class HtmlPlaybackModule implements IPlaybackModule {
       // this._eventBus?.emitEventStatusChanged({
       //   status: PlaybackStatus.Paused,
       // });
+      playbackState.state = PlaybackModuleState.Paused;
     });
 
     this._playbackModule.addEventListener("ended", () => {
@@ -43,6 +52,11 @@ class HtmlPlaybackModule implements IPlaybackModule {
       // this._eventBus?.emitEventStatusChanged({
       //   status: PlaybackStatus.End,
       // });
+      playbackState.state = PlaybackModuleState.End;
+    });
+
+    this._playbackModule.addEventListener("volumechange", () => {
+      // TODO: volume 상태 update
     });
   }
 
@@ -100,5 +114,3 @@ class HtmlPlaybackModule implements IPlaybackModule {
     return this._playbackModule.duration;
   }
 }
-
-export const htmlPlayback = new HtmlPlaybackModule();

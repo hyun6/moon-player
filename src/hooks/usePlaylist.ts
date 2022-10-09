@@ -36,14 +36,14 @@ export function usePlaylist(): [PlaylistState, PlaylistActions] {
   const [playbackState, playbackActions] = usePlayback();
 
   useEffect(() => {
-    tauriListener.onFileDropEvent((filePath: string[]) => {
+    tauriListener.onFileDropEvent(async (filePath: string[]) => {
       console.log("filePath: ", filePath);
       const track: TrackModel = {
         id: "0",
         name: filePath[0],
         source: filePath[0],
       };
-      playbackActions.open(track);
+      await playbackActions.open(track);
       playbackActions.play();
     });
   }, [tauriListener]);

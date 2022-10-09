@@ -1,23 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
-import { htmlPlayback } from "../feature/playback/playback.html";
+import { HtmlPlaybackModule } from "../feature/playback/playback.html";
+import {
+  PlaybackModuleState,
+  PlaybackState,
+} from "../models/playbackState.model";
 import { TrackModel } from "../models/track.model";
-
-/** UI 상태 정의 */
-interface PlaybackState {
-  currentTrack?: TrackModel;
-  isPlaying: boolean;
-  isShuffle: boolean;
-  currentTime: number;
-  durationTime: number;
-}
-
-/** 상태 초기 값 */
-const initState = {
-  isPlaying: false,
-  isShuffle: false,
-  currentTime: 0,
-  durationTime: 0,
-};
+import { proxy, useSnapshot } from "valtio";
+import { ReadonlyDeep } from "type-fest";
+import { useEffect } from "react";
 
 /** UI use case 인터페이스 */
 interface PlaybackActions {
@@ -29,30 +18,61 @@ interface PlaybackActions {
   prevPlay(): void;
 }
 
-export function usePlayback(): [PlaybackState, PlaybackActions] {
-  const [state, setState] = useState<PlaybackState>(initState);
+/** 상태 초기 값 */
+const initState = {
+  state: PlaybackModuleState.Idle,
+  isPlaying: false,
+  isShuffle: false,
+  currentTime: 0,
+  durationTime: 0,
+};
 
-  // TODO
-  // - playback event 수신
-  // - playback 상태 관리
-  // - playback 함수 UI와 연결
-  const actions = useMemo<PlaybackActions>(
-    () => ({
-      open: (track: TrackModel) => {
-        htmlPlayback.open(track.source);
-      },
-      play: () => {
-        htmlPlayback.play();
-      },
-      pause: () => {
-        htmlPlayback.pause();
-      },
-      nextPlay: () => {},
-      prevPlay: () => {},
-      toggleShuffle: async () => {},
-    }),
-    []
-  );
+export const playbackState = proxy<PlaybackState>(initState);
+export const htmlPlayback = new HtmlPlaybackModule();
+export const playbackActions = {
+  open: async (track: TrackModel) => {
+    await htmlPlayback.open(track.source);
+  },
+  play: () => {
+    htmlPlayback.play();
+  },
+  pause: () => {
+    htmlPlayback.pause();
+  },
+  nextPlay: () => {},
+  prevPlay: () => {},
+  toggleShuffle: async () => {},
+};
 
-  return [state, actions];
+export function usePlayback(): [ReadonlyDeep<PlaybackState>, PlaybackActions] {
+  const playbackStateSnapshot = useSnapshot(playbackState);
+
+  useEffect(() => {
+    switch (playbackStateSnapshot.state) {
+      case PlaybackModuleState.Prepared: {
+        // playbackState.currentTrack = playbackController.getCurrentTrack();
+        // playbackState.durationTime = playbackController.getDuration();
+        break;
+      }
+      case PlaybackModuleState.Started: {
+        playbackState.isPlaying = true;
+        break;
+      }
+      case PlaybackModuleState.Paused: {
+        playbackState.isPlaying = false;
+        break;
+      }
+      case PlaybackModuleState.End: {
+        playbackState.isPlaying = false;
+        // state.currentTime = 0;
+        // playbackController.nextPlay();
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }, [playbackStateSnapshot.state]);
+
+  return [playbackStateSnapshot, playbackActions];
 }

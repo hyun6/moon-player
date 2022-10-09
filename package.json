@@ -18,7 +18,9 @@
     "@tauri-apps/api": "^1.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "tauri-plugin-store-api": "github:tauri-apps/tauri-plugin-store#dev"
+    "tauri-plugin-store-api": "github:tauri-apps/tauri-plugin-store#dev",
+    "type-fest": "^3.0.0",
+    "valtio": "^1.7.2"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.1.1",

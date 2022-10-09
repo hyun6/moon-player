@@ -12,6 +12,7 @@ import FastRewindRounded from "@mui/icons-material/FastRewindRounded";
 import VolumeUpRounded from "@mui/icons-material/VolumeUpRounded";
 import VolumeDownRounded from "@mui/icons-material/VolumeDownRounded";
 import MelonImg from "../assets/melon.png";
+import { usePlayback } from "../hooks/usePlayback";
 
 const WallPaper = styled("div")({
   position: "absolute",
@@ -79,10 +80,11 @@ const TinyText = styled(Typography)({
 });
 
 export default function PlaybackPage() {
+  const [playbackState, playbackActions] = usePlayback();
+
   const theme = useTheme();
   const duration = 200; // seconds
   const [position, setPosition] = React.useState(32);
-  const [paused, setPaused] = React.useState(false);
   function formatDuration(value: number) {
     const minute = Math.floor(value / 60);
     const secondLeft = value - minute * 60;
@@ -173,10 +175,14 @@ export default function PlaybackPage() {
             <FastRewindRounded fontSize="large" htmlColor={mainIconColor} />
           </IconButton>
           <IconButton
-            aria-label={paused ? "play" : "pause"}
-            onClick={() => setPaused(!paused)}
+            aria-label={playbackState.isPlaying ? "play" : "pause"}
+            onClick={
+              playbackState.isPlaying
+                ? playbackActions.pause
+                : playbackActions.play
+            }
           >
-            {paused ? (
+            {!playbackState.isPlaying ? (
               <PlayArrowRounded
                 sx={{ fontSize: "3rem" }}
                 htmlColor={mainIconColor}

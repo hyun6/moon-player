@@ -18,4 +18,5 @@ export interface ArtistModel {
 export interface AlbumModel {
   id: AlbumId;
   name: string;
+  coverImgUrl?: string;
 }
