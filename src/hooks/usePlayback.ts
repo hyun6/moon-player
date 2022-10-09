@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { htmlPlayback } from "../feature/playback/playback.html";
 import { TrackModel } from "../models/track.model";
 
 /** UI 상태 정의 */
@@ -37,9 +38,15 @@ export function usePlayback(): [PlaybackState, PlaybackActions] {
   // - playback 함수 UI와 연결
   const actions = useMemo<PlaybackActions>(
     () => ({
-      open: (track: TrackModel) => {},
-      play: () => {},
-      pause: () => {},
+      open: (track: TrackModel) => {
+        htmlPlayback.open(track.source);
+      },
+      play: () => {
+        htmlPlayback.play();
+      },
+      pause: () => {
+        htmlPlayback.pause();
+      },
       nextPlay: () => {},
       prevPlay: () => {},
       toggleShuffle: async () => {},

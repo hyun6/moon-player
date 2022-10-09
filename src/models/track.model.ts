@@ -5,8 +5,8 @@ export type AlbumId = string;
 export interface TrackModel {
   id: TrackId;
   name: string;
-  artists: ArtistModel[];
-  album: AlbumModel;
+  artists?: ArtistModel[];
+  album?: AlbumModel;
   source: string;
 }
 

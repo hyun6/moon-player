@@ -2,6 +2,7 @@ import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TrackId, TrackModel } from "../models/track.model";
 import { tauriListener } from "../tauri/listener";
+import { usePlayback } from "./usePlayback";
 
 /** UI 상태 정의 */
 interface PlaylistState {
@@ -32,10 +33,18 @@ interface PlaylistActions {
  */
 export function usePlaylist(): [PlaylistState, PlaylistActions] {
   const [state, setState] = useState(initState);
+  const [playbackState, playbackActions] = usePlayback();
 
   useEffect(() => {
-    tauriListener.onFileDropEvent((event) => {
-      console.log("fileDropEvent: ", event);
+    tauriListener.onFileDropEvent((filePath: string[]) => {
+      console.log("filePath: ", filePath);
+      const track: TrackModel = {
+        id: "0",
+        name: filePath[0],
+        source: filePath[0],
+      };
+      playbackActions.open(track);
+      playbackActions.play();
     });
   }, [tauriListener]);
 
