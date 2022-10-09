@@ -224,7 +224,6 @@ export default function PlaybackPage() {
           <VolumeUpRounded htmlColor={lightIconColor} />
         </Stack>
       </Widget>
-      <WallPaper />
     </Box>
   );
 }
