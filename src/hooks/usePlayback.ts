@@ -27,6 +27,15 @@ const initState = {
   durationTime: 0,
 };
 
+// TODO: state, action을 feature로 옮기기?
+// - 역시 feature 단위로 구현을 묶는 편이 좋은듯
+// - valtio 기반 UI 상태, UI use case 관리
+//  ㄴ custom hook에서 사용
+// - UI use case 처리를 위한 비지니스 로직
+//  ㄴ 가능한 레이어를 두지 않고.. 필요할 때 레이어 추가하기
+// - react-query 기반 서버 상태 관리
+// 의존성 흐름: UI -> custom hook -> valtio state, action <-(상태 변경 이벤트 콜백을 valtio state로 대체하기 위해 상호 의존 허용)-> business logic -> infra (tauri plugin, api...)
+
 export const playbackState = proxy<PlaybackState>(initState);
 export const htmlPlayback = new HtmlPlaybackModule();
 export const playbackActions = {
