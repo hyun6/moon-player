@@ -1,4 +1,4 @@
-import { TrackModel } from "./track.model";
+import { TrackModel } from "../track/track.model";
 
 /**
  * 재생 모듈 상태

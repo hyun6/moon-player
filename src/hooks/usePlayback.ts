@@ -1,31 +1,16 @@
 import { HtmlPlaybackModule } from "../feature/playback/playback.html";
+import { TrackModel } from "../feature/track/track.model";
+import { useSnapshot } from "valtio";
+import { ReadonlyDeep } from "type-fest";
+import { useEffect } from "react";
+import { IPlaybackModule } from "../feature/playback/playback.interface";
+import { proxyPlaybackState } from "../feature/playback/playback.store";
 import {
   PlaybackModuleState,
   PlaybackState,
-} from "../models/playbackState.model";
-import { TrackModel } from "../models/track.model";
-import { proxy, useSnapshot } from "valtio";
-import { ReadonlyDeep } from "type-fest";
-import { useEffect } from "react";
+} from "../feature/playback/playback.model";
 
 /** UI use case 인터페이스 */
-interface PlaybackActions {
-  toggleShuffle(): void;
-  open(track: TrackModel): void;
-  play(): void;
-  pause(): void;
-  nextPlay(): void;
-  prevPlay(): void;
-}
-
-/** 상태 초기 값 */
-const initState = {
-  state: PlaybackModuleState.Idle,
-  isPlaying: false,
-  isShuffle: false,
-  currentTime: 0,
-  durationTime: 0,
-};
 
 // TODO: state, action을 feature로 옮기기?
 // - 역시 feature 단위로 구현을 묶는 편이 좋은듯
@@ -35,10 +20,19 @@ const initState = {
 //  ㄴ 가능한 레이어를 두지 않고.. 필요할 때 레이어 추가하기
 // - react-query 기반 서버 상태 관리
 // 의존성 흐름: UI -> custom hook -> valtio state, action <-(상태 변경 이벤트 콜백을 valtio state로 대체하기 위해 상호 의존 허용)-> business logic -> infra (tauri plugin, api...)
+//  - 필요 시 custom hook이 UI state, action 매핑하는 역할..
+export const htmlPlayback: IPlaybackModule = new HtmlPlaybackModule();
 
-export const playbackState = proxy<PlaybackState>(initState);
-export const htmlPlayback = new HtmlPlaybackModule();
-export const playbackActions = {
+interface PlaybackActions {
+  toggleShuffle(): void;
+  open(track: TrackModel): void;
+  play(): void;
+  pause(): void;
+  nextPlay(): void;
+  prevPlay(): void;
+}
+
+export const playbackActions: PlaybackActions = {
   open: async (track: TrackModel) => {
     await htmlPlayback.open(track.source);
   },
@@ -54,25 +48,27 @@ export const playbackActions = {
 };
 
 export function usePlayback(): [ReadonlyDeep<PlaybackState>, PlaybackActions] {
-  const playbackStateSnapshot = useSnapshot(playbackState);
+  const playbackStateSnapshot = useSnapshot(proxyPlaybackState);
 
   useEffect(() => {
-    switch (playbackStateSnapshot.state) {
+    switch (proxyPlaybackState.state) {
       case PlaybackModuleState.Prepared: {
         // playbackState.currentTrack = playbackController.getCurrentTrack();
         // playbackState.durationTime = playbackController.getDuration();
         break;
       }
       case PlaybackModuleState.Started: {
-        playbackState.isPlaying = true;
+        console.log("started");
+        proxyPlaybackState.isPlaying = true;
         break;
       }
       case PlaybackModuleState.Paused: {
-        playbackState.isPlaying = false;
+        console.log("paused");
+        proxyPlaybackState.isPlaying = false;
         break;
       }
       case PlaybackModuleState.End: {
-        playbackState.isPlaying = false;
+        proxyPlaybackState.isPlaying = false;
         // state.currentTime = 0;
         // playbackController.nextPlay();
         break;
@@ -81,7 +77,7 @@ export function usePlayback(): [ReadonlyDeep<PlaybackState>, PlaybackActions] {
         break;
       }
     }
-  }, [playbackStateSnapshot.state]);
+  }, [proxyPlaybackState.state]);
 
   return [playbackStateSnapshot, playbackActions];
 }

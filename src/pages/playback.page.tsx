@@ -13,6 +13,7 @@ import VolumeUpRounded from "@mui/icons-material/VolumeUpRounded";
 import VolumeDownRounded from "@mui/icons-material/VolumeDownRounded";
 import MelonImg from "../assets/melon.png";
 import { usePlayback } from "../hooks/usePlayback";
+import { proxyPlaybackState } from "../feature/playback/playback.store";
 
 const WallPaper = styled("div")({
   position: "absolute",
@@ -83,13 +84,15 @@ export default function PlaybackPage() {
   const [playbackState, playbackActions] = usePlayback();
 
   const theme = useTheme();
-  const duration = 200; // seconds
-  const [position, setPosition] = React.useState(32);
+  const duration = playbackState.durationTime; // seconds
+  const position = playbackState.currentTime;
+
   function formatDuration(value: number) {
     const minute = Math.floor(value / 60);
-    const secondLeft = value - minute * 60;
+    const secondLeft = Math.floor(value - minute * 60);
     return `${minute}:${secondLeft < 10 ? `0${secondLeft}` : secondLeft}`;
   }
+
   const mainIconColor = theme.palette.mode === "dark" ? "#fff" : "#000";
   const lightIconColor =
     theme.palette.mode === "dark" ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)";
@@ -124,7 +127,9 @@ export default function PlaybackPage() {
           min={0}
           step={1}
           max={duration}
-          onChange={(_, value) => setPosition(value as number)}
+          onChange={(_, value) =>
+            (proxyPlaybackState.currentTime = value as number)
+          }
           sx={{
             color: theme.palette.mode === "dark" ? "#fff" : "rgba(0,0,0,0.87)",
             height: 4,

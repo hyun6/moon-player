@@ -1,6 +1,6 @@
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { TrackId, TrackModel } from "../models/track.model";
+import { TrackId, TrackModel } from "../feature/track/track.model";
 import { tauriListener } from "../tauri/listener";
 import { usePlayback } from "./usePlayback";
 

@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useEffect, useState, useRef } from "react";
 import { PlayArrow, PlaylistAdd, Repeat } from "@mui/icons-material";
-import { TrackId, TrackModel } from "../models/track.model";
+import { TrackId, TrackModel } from "../feature/track/track.model";
 import { usePlayback } from "../hooks/usePlayback";
 import { usePlaylist } from "../hooks/usePlaylist";
 import { Box } from "@mui/material";
