@@ -27,4 +27,5 @@ export interface PlaybackState {
   isShuffle: boolean;
   currentTime: number;
   durationTime: number;
+  volume: number; // 0~100
 }

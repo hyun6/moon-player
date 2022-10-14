@@ -1,10 +1,10 @@
 export interface IPlaybackModule {
   open(sourceUrl: string): Promise<boolean>;
-  play(progressMs?: number): void;
+  play(msPosition?: number): void;
   pause(): void;
   resume(): void;
   close(): void;
-  seek(progressMs: number): void;
+  seek(msPosition: number): void;
   volume(percentage: number): void;
   mute(): void;
   getDuration(): number;

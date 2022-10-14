@@ -13,7 +13,6 @@ import VolumeUpRounded from "@mui/icons-material/VolumeUpRounded";
 import VolumeDownRounded from "@mui/icons-material/VolumeDownRounded";
 import MelonImg from "../assets/melon.png";
 import { usePlayback } from "../hooks/usePlayback";
-import { proxyPlaybackState } from "../feature/playback/playback.store";
 
 const WallPaper = styled("div")({
   position: "absolute",
@@ -86,6 +85,7 @@ export default function PlaybackPage() {
   const theme = useTheme();
   const duration = playbackState.durationTime; // seconds
   const position = playbackState.currentTime;
+  const volume = playbackState.volume;
 
   function formatDuration(value: number) {
     const minute = Math.floor(value / 60);
@@ -127,9 +127,7 @@ export default function PlaybackPage() {
           min={0}
           step={1}
           max={duration}
-          onChange={(_, value) =>
-            (proxyPlaybackState.currentTime = value as number)
-          }
+          onChange={(_, value) => playbackActions.seek(value as number)}
           sx={{
             color: theme.palette.mode === "dark" ? "#fff" : "rgba(0,0,0,0.87)",
             height: 4,
@@ -212,7 +210,10 @@ export default function PlaybackPage() {
           <VolumeDownRounded htmlColor={lightIconColor} />
           <Slider
             aria-label="Volume"
-            defaultValue={30}
+            defaultValue={volume}
+            min={0}
+            max={100}
+            onChange={(_, value) => playbackActions.volume(value as number)}
             sx={{
               color:
                 theme.palette.mode === "dark" ? "#fff" : "rgba(0,0,0,0.87)",

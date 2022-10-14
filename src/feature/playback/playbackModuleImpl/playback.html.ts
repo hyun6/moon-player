@@ -1,7 +1,7 @@
 import { convertFileSrc } from "@tauri-apps/api/tauri";
-import { IPlaybackModule } from "./playback.interface";
-import { PlaybackModuleState } from "./playback.model";
-import { proxyPlaybackState } from "./playback.store";
+import { IPlaybackModule } from "../playback.interface";
+import { PlaybackModuleState } from "../playback.model";
+import { proxyPlaybackState } from "../playback.store";
 
 const logger = console.log;
 
@@ -14,47 +14,46 @@ export class HtmlPlaybackModule implements IPlaybackModule {
 
   private _initPlaybackEventListener(): void {
     this._playbackModule.addEventListener("timeupdate", () => {
-      // this._eventBus?.emitEventTimeUpdated({
-      //   currentTime: this._playbackModule.currentTime,
-      // });
+      logger("event:timeupdate");
       proxyPlaybackState.currentTime = this._playbackModule.currentTime;
     });
 
     this._playbackModule.addEventListener("canplay", () => {
       logger("event:canplay");
-      // this._eventBus?.emitEventStatusChanged({
-      //   status: PlaybackStatus.Prepared,
-      // });
       proxyPlaybackState.state = PlaybackModuleState.Prepared;
       proxyPlaybackState.durationTime = this._playbackModule.duration;
     });
 
     this._playbackModule.addEventListener("play", () => {
       logger("event:play");
-      // this._eventBus?.emitEventStatusChanged({
-      //   status: PlaybackStatus.Started,
-      // });
       proxyPlaybackState.state = PlaybackModuleState.Started;
+      proxyPlaybackState.isPlaying = true;
     });
 
     this._playbackModule.addEventListener("pause", () => {
       logger("event:pause");
-      // this._eventBus?.emitEventStatusChanged({
-      //   status: PlaybackStatus.Paused,
-      // });
       proxyPlaybackState.state = PlaybackModuleState.Paused;
+      proxyPlaybackState.isPlaying = false;
     });
 
     this._playbackModule.addEventListener("ended", () => {
       logger("event:ended");
-      // this._eventBus?.emitEventStatusChanged({
-      //   status: PlaybackStatus.End,
-      // });
       proxyPlaybackState.state = PlaybackModuleState.End;
+      proxyPlaybackState.isPlaying = false;
     });
 
     this._playbackModule.addEventListener("volumechange", () => {
-      // TODO: volume 상태 update
+      logger("event:volumeChange");
+    });
+
+    this._playbackModule.addEventListener("durationchange", () => {
+      logger("event:durationChange");
+      proxyPlaybackState.durationTime = this._playbackModule.duration;
+    });
+
+    this._playbackModule.addEventListener("currentTime", () => {
+      logger("event:durationChange");
+      proxyPlaybackState.durationTime = this._playbackModule.duration;
     });
   }
 
@@ -72,8 +71,11 @@ export class HtmlPlaybackModule implements IPlaybackModule {
     return true;
   }
 
-  play(progressMs?: number | undefined): void {
+  play(msPosition?: number | undefined): void {
     logger("play");
+    if (msPosition) {
+      this.seek(msPosition);
+    }
     this._playbackModule.play();
   }
 
@@ -92,16 +94,17 @@ export class HtmlPlaybackModule implements IPlaybackModule {
     this._playbackModule.src = "";
   }
 
-  seek(progressMs: number): void {
-    this._playbackModule.fastSeek(progressMs);
+  seek(msPosition: number): void {
+    logger("seek: ", msPosition);
+    // this._playbackModule.fastSeek(msPosition);
+    this._playbackModule.currentTime = msPosition;
   }
 
   volume(percentage: number): void {
-    // TODO: 주석에 volume level로 되어있음, percentage로 변환 방식 확인 필요
-    this._playbackModule.volume = percentage;
-    if (percentage !== 0) {
-      this._playbackModule.muted = false;
-    }
+    // - https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/volume
+    // - 0 ~ 1 범위로 설정
+    this._playbackModule.volume = percentage / 100;
+    this._playbackModule.muted = percentage === 0;
   }
 
   mute(): void {
