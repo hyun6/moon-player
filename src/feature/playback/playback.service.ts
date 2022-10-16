@@ -1,6 +1,6 @@
 import { proxy } from "valtio";
 import { readBinaryFile } from "@tauri-apps/api/fs";
-import musicMetadataBrowser from "music-metadata-browser";
+import * as musicMetadataBrowser from "music-metadata-browser";
 
 import { IPlaybackModule } from "./playback.interface";
 import { PlaybackModuleState, PlaybackState } from "./playback.model";
@@ -30,7 +30,9 @@ class PlaybackService {
     const ok = await this._playbackModule.open(sourceUrl);
     if (ok) {
       const fileByteArray = await readBinaryFile(sourceUrl);
-      const metaData = await musicMetadataBrowser.parseReadableStream();
+      const metaData = await musicMetadataBrowser.parseBlob(
+        new Blob([fileByteArray])
+      );
       console.log(metaData);
       return true;
     }
