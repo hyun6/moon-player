@@ -1,4 +1,4 @@
-import { EventCallback, listen, UnlistenFn } from "@tauri-apps/api/event";
+import { listen, UnlistenFn } from "@tauri-apps/api/event";
 
 class TauriListener {
   private _fileDropEventOff?: UnlistenFn;

@@ -1,6 +1,6 @@
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { IPlaybackModule } from "../playback.interface";
-import { PlaybackModuleState } from "../playback.model";
+import { PlaybackModuleStatus } from "../playback.model";
 import { proxyPlaybackState } from "../playback.service";
 
 const logger = console.log;
@@ -20,25 +20,25 @@ export class HtmlPlaybackModule implements IPlaybackModule {
 
     this._playbackModule.addEventListener("canplay", () => {
       logger("event:canplay");
-      proxyPlaybackState.state = PlaybackModuleState.Prepared;
+      proxyPlaybackState.status = PlaybackModuleStatus.Prepared;
       proxyPlaybackState.durationTime = this._playbackModule.duration;
     });
 
     this._playbackModule.addEventListener("play", () => {
       logger("event:play");
-      proxyPlaybackState.state = PlaybackModuleState.Started;
+      proxyPlaybackState.status = PlaybackModuleStatus.Started;
       proxyPlaybackState.isPlaying = true;
     });
 
     this._playbackModule.addEventListener("pause", () => {
       logger("event:pause");
-      proxyPlaybackState.state = PlaybackModuleState.Paused;
+      proxyPlaybackState.status = PlaybackModuleStatus.Paused;
       proxyPlaybackState.isPlaying = false;
     });
 
     this._playbackModule.addEventListener("ended", () => {
       logger("event:ended");
-      proxyPlaybackState.state = PlaybackModuleState.End;
+      proxyPlaybackState.status = PlaybackModuleStatus.End;
       proxyPlaybackState.isPlaying = false;
     });
 

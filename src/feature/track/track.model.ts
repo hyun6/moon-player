@@ -19,4 +19,5 @@ export interface AlbumModel {
   id: AlbumId;
   name: string;
   coverImgUrl?: string;
+  coverImg?: Blob;
 }

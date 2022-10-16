@@ -6,7 +6,7 @@ import { TrackModel } from "../track/track.model";
  * 참고: https://developer.android.com/reference/android/media/MediaPlayer#state-diagram
  *  - 일단 모두 넣어보고 필요한 상태만 남길 예정
  */
-export enum PlaybackModuleState {
+export enum PlaybackModuleStatus {
   Idle,
   Init,
   Preparing,
@@ -21,7 +21,7 @@ export enum PlaybackModuleState {
 
 /** Playback 상태 관리 객체 정의 */
 export interface PlaybackState {
-  state: PlaybackModuleState;
+  status: PlaybackModuleStatus;
   playingTrack?: TrackModel;
   isPlaying: boolean;
   isShuffle: boolean;
