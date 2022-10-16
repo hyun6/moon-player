@@ -21,4 +21,5 @@ export default defineConfig({
     // 디버그 빌드에서 소스맵을 제공합니다.
     sourcemap: !!process.env.TAURI_DEBUG,
   },
+  define: { global: {} },
 });

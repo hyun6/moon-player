@@ -1,7 +1,7 @@
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { IPlaybackModule } from "../playback.interface";
 import { PlaybackModuleState } from "../playback.model";
-import { proxyPlaybackState } from "../playback.store";
+import { proxyPlaybackState } from "../playback.service";
 
 const logger = console.log;
 
