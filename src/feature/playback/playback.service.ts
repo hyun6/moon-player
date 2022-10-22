@@ -1,23 +1,9 @@
-import { proxy } from "valtio";
 import { readBinaryFile } from "@tauri-apps/api/fs";
 import * as musicMetadataBrowser from "music-metadata-browser";
 
 import { IPlaybackModule } from "./playback.interface";
-import { PlaybackModuleStatus, PlaybackState } from "./playback.model";
 import { HtmlPlaybackModule } from "./playbackModuleImpl/playback.html";
 import { IAudioMetadata } from "music-metadata-browser";
-
-/** 상태 초기 값 */
-const initState = {
-  status: PlaybackModuleStatus.Idle,
-  isPlaying: false,
-  isShuffle: false,
-  currentTime: 0,
-  durationTime: 0,
-  volume: 30,
-};
-
-export const proxyPlaybackState = proxy<PlaybackState>(initState);
 
 // proxy state를 class 내부에 두려고 했으나
 // state 변경 시 에러 발생 등의 이유로 state와 class(actions)로 분리
@@ -37,14 +23,14 @@ class PlaybackService {
       // rust로 메타 데이터 파싱 로직을 옮기고 성능 비교 필요
       const readStart = performance.now();
       const fileByteArray = await readBinaryFile(sourceUrl);
-      const readEnd = performance.now();
+      const readEnd = performance.now(); // 약 10초 소요
       console.log("readFile: ", readEnd - readStart);
 
       const parseStart = performance.now();
       this._audioMetaData = await musicMetadataBrowser.parseBlob(
         new Blob([fileByteArray])
       );
-      const parseEnd = performance.now();
+      const parseEnd = performance.now(); // 약 30ms 소요
       console.log("parseFile: ", parseEnd - parseStart);
       console.log(this._audioMetaData);
       return true;

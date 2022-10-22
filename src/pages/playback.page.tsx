@@ -12,7 +12,10 @@ import FastRewindRounded from "@mui/icons-material/FastRewindRounded";
 import VolumeUpRounded from "@mui/icons-material/VolumeUpRounded";
 import VolumeDownRounded from "@mui/icons-material/VolumeDownRounded";
 import MelonImg from "../assets/melon.png";
-import { usePlayback } from "../hooks/usePlayback";
+
+import { useSnapshot } from "valtio";
+import { playbackStore } from "../feature/playback/playback.store";
+import { playbackService } from "../feature/playback/playback.service";
 
 const WallPaper = styled("div")({
   position: "absolute",
@@ -80,12 +83,12 @@ const TinyText = styled(Typography)({
 });
 
 export default function PlaybackPage() {
-  const [playbackState, playbackActions] = usePlayback();
+  const playbackStateSnapshot = useSnapshot(playbackStore);
 
   const theme = useTheme();
-  const duration = playbackState.durationTime; // seconds
-  const position = playbackState.currentTime;
-  const volume = playbackState.volume;
+  const duration = playbackStateSnapshot.durationTime; // seconds
+  const position = playbackStateSnapshot.currentTime;
+  const volume = playbackStateSnapshot.volume;
 
   function formatDuration(value: number) {
     const minute = Math.floor(value / 60);
@@ -127,7 +130,7 @@ export default function PlaybackPage() {
           min={0}
           step={1}
           max={duration}
-          onChange={(_, value) => playbackActions.seek(value as number)}
+          onChange={(_, value) => playbackService.seek(value as number)}
           sx={{
             color: theme.palette.mode === "dark" ? "#fff" : "rgba(0,0,0,0.87)",
             height: 4,
@@ -178,14 +181,14 @@ export default function PlaybackPage() {
             <FastRewindRounded fontSize="large" htmlColor={mainIconColor} />
           </IconButton>
           <IconButton
-            aria-label={playbackState.isPlaying ? "play" : "pause"}
-            onClick={
-              playbackState.isPlaying
-                ? playbackActions.pause
-                : playbackActions.play
-            }
+            aria-label={playbackStateSnapshot.isPlaying ? "play" : "pause"}
+            onClick={() => {
+              playbackStateSnapshot.isPlaying
+                ? playbackService.pause()
+                : playbackService.play();
+            }}
           >
-            {!playbackState.isPlaying ? (
+            {!playbackStateSnapshot.isPlaying ? (
               <PlayArrowRounded
                 sx={{ fontSize: "3rem" }}
                 htmlColor={mainIconColor}
@@ -213,7 +216,7 @@ export default function PlaybackPage() {
             defaultValue={volume}
             min={0}
             max={100}
-            onChange={(_, value) => playbackActions.volume(value as number)}
+            onChange={(_, value) => playbackService.volume(value as number)}
             sx={{
               color:
                 theme.palette.mode === "dark" ? "#fff" : "rgba(0,0,0,0.87)",

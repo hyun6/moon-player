@@ -1,7 +1,7 @@
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { IPlaybackModule } from "../playback.interface";
 import { PlaybackModuleStatus } from "../playback.model";
-import { proxyPlaybackState } from "../playback.service";
+import { playbackStore } from "../playback.store";
 
 const logger = console.log;
 
@@ -15,31 +15,31 @@ export class HtmlPlaybackModule implements IPlaybackModule {
   private _initPlaybackEventListener(): void {
     this._playbackModule.addEventListener("timeupdate", () => {
       logger("event:timeupdate");
-      proxyPlaybackState.currentTime = this._playbackModule.currentTime;
+      playbackStore.currentTime = this._playbackModule.currentTime;
     });
 
     this._playbackModule.addEventListener("canplay", () => {
       logger("event:canplay");
-      proxyPlaybackState.status = PlaybackModuleStatus.Prepared;
-      proxyPlaybackState.durationTime = this._playbackModule.duration;
+      playbackStore.status = PlaybackModuleStatus.Prepared;
+      playbackStore.durationTime = this._playbackModule.duration;
     });
 
     this._playbackModule.addEventListener("play", () => {
       logger("event:play");
-      proxyPlaybackState.status = PlaybackModuleStatus.Started;
-      proxyPlaybackState.isPlaying = true;
+      playbackStore.status = PlaybackModuleStatus.Started;
+      playbackStore.isPlaying = true;
     });
 
     this._playbackModule.addEventListener("pause", () => {
       logger("event:pause");
-      proxyPlaybackState.status = PlaybackModuleStatus.Paused;
-      proxyPlaybackState.isPlaying = false;
+      playbackStore.status = PlaybackModuleStatus.Paused;
+      playbackStore.isPlaying = false;
     });
 
     this._playbackModule.addEventListener("ended", () => {
       logger("event:ended");
-      proxyPlaybackState.status = PlaybackModuleStatus.End;
-      proxyPlaybackState.isPlaying = false;
+      playbackStore.status = PlaybackModuleStatus.End;
+      playbackStore.isPlaying = false;
     });
 
     this._playbackModule.addEventListener("volumechange", () => {
@@ -48,12 +48,12 @@ export class HtmlPlaybackModule implements IPlaybackModule {
 
     this._playbackModule.addEventListener("durationchange", () => {
       logger("event:durationChange");
-      proxyPlaybackState.durationTime = this._playbackModule.duration;
+      playbackStore.durationTime = this._playbackModule.duration;
     });
 
     this._playbackModule.addEventListener("currentTime", () => {
       logger("event:durationChange");
-      proxyPlaybackState.durationTime = this._playbackModule.duration;
+      playbackStore.durationTime = this._playbackModule.duration;
     });
   }
 

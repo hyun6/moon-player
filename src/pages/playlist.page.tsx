@@ -1,9 +1,9 @@
 import React, { ChangeEvent, useEffect, useState, useRef } from "react";
 import { PlayArrow, PlaylistAdd, Repeat } from "@mui/icons-material";
 import { TrackId, TrackModel } from "../feature/track/track.model";
-import { usePlayback } from "../hooks/usePlayback";
 import { usePlaylist } from "../hooks/usePlaylist";
 import { Box } from "@mui/material";
+import { playbackService } from "../feature/playback/playback.service";
 
 function Track({
   track,
@@ -13,7 +13,6 @@ function Track({
   onItemChecked: (id: TrackId, isChecked: boolean) => void;
 }) {
   const [bChecked, setChecked] = useState(false);
-  const [_, actions] = usePlayback();
 
   const onCheckHandler = ({ target }: ChangeEvent<HTMLInputElement>) => {
     setChecked(!bChecked);
@@ -23,8 +22,8 @@ function Track({
 
   // TODO: usePlaylist action으로 분리, controller는 hook에서만 사용하고 UI는 hook만 사용
   const handleTrackPlayClick = async () => {
-    actions.open(track);
-    actions.play();
+    playbackService.open(track.source);
+    playbackService.play();
     // 사용자가 직접 재생목록에서 곡을 선택해 재생하는 경우 다시 셔플한다
     // - https://wiki.daumkakao.com/pages/viewpage.action?pageId=983723626
     // actions.reShuffle();
