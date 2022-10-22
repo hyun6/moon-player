@@ -22,7 +22,7 @@ function Track({
 
   // TODO: usePlaylist action으로 분리, controller는 hook에서만 사용하고 UI는 hook만 사용
   const handleTrackPlayClick = async () => {
-    playbackService.open(track.source);
+    playbackService.open(track);
     playbackService.play();
     // 사용자가 직접 재생목록에서 곡을 선택해 재생하는 경우 다시 셔플한다
     // - https://wiki.daumkakao.com/pages/viewpage.action?pageId=983723626

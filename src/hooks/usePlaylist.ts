@@ -41,7 +41,7 @@ export function usePlaylist(): [PlaylistState, PlaylistActions] {
         name: filePath[0],
         source: filePath[0],
       };
-      if (await playbackService.open(track.source)) {
+      if (await playbackService.open(track)) {
         playbackService.play();
       }
     });

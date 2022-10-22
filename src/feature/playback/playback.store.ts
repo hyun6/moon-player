@@ -1,4 +1,4 @@
-import { proxy } from "valtio";
+import { proxy, useSnapshot } from "valtio";
 import { TrackModel } from "../track/track.model";
 import { PlaybackModuleStatus } from "./playback.model";
 
@@ -30,3 +30,8 @@ const initState = {
  *  - 필요하다고 판단될 때 actions 추가 예정
  */
 export const playbackStore = proxy<PlaybackStore>(initState);
+
+export function usePlaybackState() {
+  const snapshot = useSnapshot(playbackStore);
+  return snapshot;
+}

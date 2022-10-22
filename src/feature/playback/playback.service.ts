@@ -1,9 +1,11 @@
-import { readBinaryFile } from "@tauri-apps/api/fs";
+import { readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
 import * as musicMetadataBrowser from "music-metadata-browser";
 
 import { IPlaybackModule } from "./playback.interface";
 import { HtmlPlaybackModule } from "./playbackModuleImpl/playback.html";
 import { IAudioMetadata } from "music-metadata-browser";
+import { playbackStore } from "./playback.store";
+import { TrackModel } from "../track/track.model";
 
 // proxy state를 class 내부에 두려고 했으나
 // state 변경 시 에러 발생 등의 이유로 state와 class(actions)로 분리
@@ -16,13 +18,13 @@ class PlaybackService {
     this._playbackModule = playbackModule;
   }
 
-  async open(sourceUrl: string): Promise<boolean> {
-    const ok = await this._playbackModule.open(sourceUrl);
+  async open(track: TrackModel): Promise<boolean> {
+    const ok = await this._playbackModule.open(track.source);
     if (ok) {
       // 약 5초 소요되는 듯...
       // rust로 메타 데이터 파싱 로직을 옮기고 성능 비교 필요
       const readStart = performance.now();
-      const fileByteArray = await readBinaryFile(sourceUrl);
+      const fileByteArray = await readBinaryFile(track.source);
       const readEnd = performance.now(); // 약 10초 소요
       console.log("readFile: ", readEnd - readStart);
 
@@ -33,6 +35,21 @@ class PlaybackService {
       const parseEnd = performance.now(); // 약 30ms 소요
       console.log("parseFile: ", parseEnd - parseStart);
       console.log(this._audioMetaData);
+
+      // metadata to playingTrack
+      track.name = this._audioMetaData.common.title ?? track.source;
+      const coverImg = musicMetadataBrowser.selectCover(
+        this._audioMetaData.common.picture
+      );
+      track.album = {
+        id: "",
+        name: this._audioMetaData.common.album ?? "",
+        coverImg: coverImg ?? undefined,
+        //coverImg: coverImg ? new Blob([coverImg.data]) : undefined, // Blob to img src not working
+      };
+      track.artist = this._audioMetaData.common.artist ?? "";
+      playbackStore.playingTrack = track;
+
       return true;
     }
     return false;

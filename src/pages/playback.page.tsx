@@ -13,8 +13,7 @@ import VolumeUpRounded from "@mui/icons-material/VolumeUpRounded";
 import VolumeDownRounded from "@mui/icons-material/VolumeDownRounded";
 import MelonImg from "../assets/melon.png";
 
-import { useSnapshot } from "valtio";
-import { playbackStore } from "../feature/playback/playback.store";
+import { usePlaybackState } from "../feature/playback/playback.store";
 import { playbackService } from "../feature/playback/playback.service";
 
 const WallPaper = styled("div")({
@@ -83,12 +82,13 @@ const TinyText = styled(Typography)({
 });
 
 export default function PlaybackPage() {
-  const playbackStateSnapshot = useSnapshot(playbackStore);
+  const playbackStateSnapshot = usePlaybackState();
 
   const theme = useTheme();
   const duration = playbackStateSnapshot.durationTime; // seconds
   const position = playbackStateSnapshot.currentTime;
   const volume = playbackStateSnapshot.volume;
+  const playingTrack = playbackStateSnapshot.playingTrack;
 
   function formatDuration(value: number) {
     const minute = Math.floor(value / 60);
@@ -105,7 +105,22 @@ export default function PlaybackPage() {
       <Widget>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <CoverImage>
-            <img alt="can't win - Chilling Sunday" src={MelonImg} />
+            <img
+              id="coverImage"
+              alt="can't win - Chilling Sunday"
+              src={
+                // https://github.com/Borewit/music-metadata#access-cover-art
+                playingTrack?.album?.coverImg
+                  ? `data:${
+                      playingTrack.album.coverImg.format
+                    };base64,${playingTrack.album.coverImg.data.toString(
+                      "base64"
+                    )}`
+                  : MelonImg
+                //   `${window.URL.createObjectURL(playingTrack.album.coverImg)}` // Blob coverImg not working
+                // : MelonImg
+              }
+            />
           </CoverImage>
           <Box sx={{ ml: 1.5, minWidth: 0 }}>
             <Typography
@@ -113,13 +128,13 @@ export default function PlaybackPage() {
               color="text.secondary"
               fontWeight={500}
             >
-              가수
+              {playingTrack?.artist}
             </Typography>
             <Typography noWrap>
-              <b>곡명</b>
+              <b>{playingTrack?.name}</b>
             </Typography>
             <Typography noWrap letterSpacing={-0.25}>
-              앨범명
+              {playingTrack?.album?.name}
             </Typography>
           </Box>
         </Box>
