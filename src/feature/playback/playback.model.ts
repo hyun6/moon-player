@@ -18,3 +18,14 @@ export enum PlaybackModuleStatus {
   End,
   Error,
 }
+
+/** Playback 상태 관리 객체 정의 */
+export interface PlaybackStore {
+  status: PlaybackModuleStatus;
+  playingTrack?: TrackModel;
+  isPlaying: boolean;
+  isShuffle: boolean;
+  currentTime: number;
+  durationTime: number;
+  volume: number; // 0~100
+}

@@ -1,11 +1,12 @@
-import { readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
+import { readBinaryFile } from "@tauri-apps/api/fs";
 import * as musicMetadataBrowser from "music-metadata-browser";
 
 import { IPlaybackModule } from "./playback.interface";
 import { HtmlPlaybackModule } from "./playbackModuleImpl/playback.html";
 import { IAudioMetadata } from "music-metadata-browser";
 import { playbackStore } from "./playback.store";
-import { TrackModel } from "../track/track.model";
+import { TrackId } from "../track/track.model";
+import { selectTrackById } from "../playlist/playlist.store";
 
 // proxy state를 class 내부에 두려고 했으나
 // state 변경 시 에러 발생 등의 이유로 state와 class(actions)로 분리
@@ -18,7 +19,11 @@ class PlaybackService {
     this._playbackModule = playbackModule;
   }
 
-  async open(track: TrackModel): Promise<boolean> {
+  async open(trackId: TrackId): Promise<boolean> {
+    const track = selectTrackById(trackId);
+    if (track === undefined) {
+      return false;
+    }
     const ok = await this._playbackModule.open(track.source);
     if (ok) {
       // 약 5초 소요되는 듯...

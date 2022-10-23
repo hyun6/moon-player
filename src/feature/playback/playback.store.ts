@@ -1,17 +1,5 @@
 import { proxy, useSnapshot } from "valtio";
-import { TrackModel } from "../track/track.model";
-import { PlaybackModuleStatus } from "./playback.model";
-
-/** Playback 상태 관리 객체 정의 */
-export interface PlaybackStore {
-  status: PlaybackModuleStatus;
-  playingTrack?: TrackModel;
-  isPlaying: boolean;
-  isShuffle: boolean;
-  currentTime: number;
-  durationTime: number;
-  volume: number; // 0~100
-}
+import { PlaybackModuleStatus, PlaybackStore } from "./playback.model";
 
 /** 상태 초기 값 */
 const initState = {
