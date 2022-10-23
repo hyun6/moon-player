@@ -1,6 +1,8 @@
 import { tauriListener } from "../../tauri/listener";
-import { playbackService } from "../playback/playback.service";
-import { TrackId, TrackModel } from "../track/track.model";
+import { newTrack } from "../track/track.func";
+import { TrackModel } from "../track/track.model";
+import { trackMappingFromAudioMetadata } from "../utils/mapper";
+import { parseMetadataFromFile } from "../utils/parseMetadata";
 import { playlistStore } from "./playlist.store";
 
 class PlaylistService {
@@ -12,34 +14,23 @@ class PlaylistService {
     playlistStore.trackList.push(track);
   }
 
-  async play(trackId: TrackId) {
-    const playTrack = playlistStore.trackList.find(
-      (track: TrackModel) => track.id === trackId
-    );
-    if (playTrack === undefined) return;
-
-    // await playbackController.open(playTrack);
-    // playbackController.play();
-  }
-
-  addLocalFileList(files: { localPath: string }[]) {
-    // playingQueueController.addLocalFileList(files);
+  async addLocalFileList(filePaths: string[]) {
+    for (const filePath of filePaths) {
+      const metadata = await parseMetadataFromFile(filePath);
+      if (metadata) {
+        const track = newTrack({ source: filePath });
+        trackMappingFromAudioMetadata(track, metadata);
+        this.add(track);
+      }
+    }
   }
 
   private _initEvent() {
-    tauriListener.onFileDropEvent(async (filePath: string[]) => {
-      console.log("filePath: ", filePath);
-      const track: TrackModel = {
-        id: "0",
-        name: filePath[0],
-        source: filePath[0],
-      };
+    tauriListener.onFileDropEvent(async (filePaths: string[]) => {
+      console.log("filePath: ", filePaths);
 
       // TODO: add to playlist as local file
-
-      if (await playbackService.open(track.id)) {
-        playbackService.play();
-      }
+      this.addLocalFileList(filePaths);
     });
   }
 }

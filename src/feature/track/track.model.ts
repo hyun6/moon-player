@@ -6,11 +6,11 @@ export type AlbumId = string;
 
 export interface TrackModel {
   id: TrackId;
-  name: string;
+  name?: string;
   artist?: string; // artists를 합친 문자열
   artists?: ArtistModel[]; // 각 artist 정보
   album?: AlbumModel;
-  source: string;
+  source?: string;
 }
 
 export interface ArtistModel {

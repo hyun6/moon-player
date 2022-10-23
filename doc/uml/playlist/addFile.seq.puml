@@ -1,0 +1,18 @@
+@startuml
+
+title add file
+
+participant UserInterface as UI
+participant playlistService as Service
+participant playlistStore as Store
+participant Util
+
+UI -> Service: addFile(file)
+Service -> Util: parseMetadata(filePath)
+Service <-- Util: return metadata
+Service -> Util: trackMapping(metadata)
+Service <-- Util: return mapped track
+Service -> Store: update playlist
+Store -> UI: update display
+
+@enduml
